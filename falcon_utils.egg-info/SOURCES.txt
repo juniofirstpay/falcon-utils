@@ -6,6 +6,7 @@ falcon_utils.egg-info/dependency_links.txt
 falcon_utils.egg-info/not-zip-safe
 falcon_utils.egg-info/requires.txt
 falcon_utils.egg-info/top_level.txt
+falcon_utils/csv/__init__.py
 falcon_utils/errors/__init__.py
 falcon_utils/middlewares/__init__.py
 falcon_utils/middlewares/auth_middleware.py
