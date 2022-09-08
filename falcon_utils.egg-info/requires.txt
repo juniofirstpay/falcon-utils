@@ -1,0 +1,5 @@
+bson==0.5.10
+elasticsearch==8.4.1
+flatten-json==0.1.13
+falcon==3.1.0
+six==1.16.0
