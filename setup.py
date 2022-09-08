@@ -4,8 +4,8 @@ requirements = open('./requirements.txt', 'r').read().split("\n")
 print(requirements)
 setup(
     name='falcon-utils',
-    packages=['falcon_utils'],
-    version='0.0.1',
+    packages=['falcon_utils', 'falcon_utils.middlewares', 'falcon_utils.errors'],
+    version='0.0.2',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
