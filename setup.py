@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 requirements = open('./requirements.txt', 'r').read().split("\n")
-print(requirements)
+
 setup(
     name='falcon-utils',
     packages=['falcon_utils', 'falcon_utils.middlewares', 'falcon_utils.errors', 'falcon_utils.csv'],
-    version='0.0.3',
+    version='0.0.4',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
