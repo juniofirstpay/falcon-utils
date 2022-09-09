@@ -4,7 +4,7 @@ requirements = open('./requirements.txt', 'r').read().split("\n")
 
 setup(
     name='falcon-utils',
-    packages=['falcon_utils', 'falcon_utils.middlewares', 'falcon_utils.errors', 'falcon_utils.csv'],
+    packages=['falcon_utils', 'falcon_utils.middlewares', 'falcon_utils.errors', 'falcon_utils.csv', 'falcon_utils.routes'],
     version='0.0.4',
     author="Develper Junio",
     author_email='developer@junio.in',
