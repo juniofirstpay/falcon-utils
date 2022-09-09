@@ -119,3 +119,19 @@ class VoucherRedeemError(ApplicationError):
         super(VoucherRedeemError, self).__init__(
             title=VoucherRedeemError.name, description=description, *args, **kwargs
         )
+
+class DataSerializationError(falcon.HTTPError):
+
+    def __init__(self, fields: Dict[str, Any], description: Optional[str] = None, code: Optional[str] = '200'):
+        super().__init__(
+            '400',
+            title='DataSerializationFailed',
+            description=description,
+            code=code
+        )
+        self.fields = fields
+
+    def to_dict(self, obj_type=dict):
+        result = super().to_dict(obj_type)
+        result['fields'] = self.fields
+        return result
