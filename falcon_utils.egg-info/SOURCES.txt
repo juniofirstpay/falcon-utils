@@ -8,6 +8,9 @@ falcon_utils.egg-info/requires.txt
 falcon_utils.egg-info/top_level.txt
 falcon_utils/csv/__init__.py
 falcon_utils/errors/__init__.py
+falcon_utils/hooks/__init__.py
+falcon_utils/hooks/serialize_schema.py
+falcon_utils/hooks/validate_schema.py
 falcon_utils/middlewares/__init__.py
 falcon_utils/middlewares/auth_middleware.py
 falcon_utils/middlewares/elastic_search_logging_middleware.py
