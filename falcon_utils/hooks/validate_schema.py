@@ -28,6 +28,6 @@ class ValidateParams(object):
 
     def __call__(self, req, resp, resource, params):
         try:
-            req.context['params'] = self.schema().load(params)
+            req.context['params'] = self.schema(**params)
         except ValidationError as err:
             SchemaValidationError(err.messages)
