@@ -12,7 +12,7 @@ setup(
         'falcon_utils.routes',
         'falcon_utils.hooks'
     ],
-    version='0.0.7',
+    version='0.0.8',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
