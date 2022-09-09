@@ -10,9 +10,10 @@ setup(
         'falcon_utils.errors', 
         'falcon_utils.csv', 
         'falcon_utils.routes',
-        'falcon_utils.hooks'
+        'falcon_utils.hooks',
+        'falcon_utils.response'
     ],
-    version='0.0.10',
+    version='0.0.11',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
