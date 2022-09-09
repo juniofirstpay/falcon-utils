@@ -2,7 +2,7 @@ from typing import Type
 from mongoengine import Document, QuerySet
 from marshmallow import ValidationError
 from marshmallow_objects import Model
-from errors import DataSerializationError
+from falcon_utils.errors import DataSerializationError
 
 class SerializeSchema(object):
 
