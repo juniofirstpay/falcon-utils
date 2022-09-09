@@ -1,5 +1,6 @@
 setup.py
 falcon_utils/__init__.py
+falcon_utils/new_relic.py
 falcon_utils.egg-info/PKG-INFO
 falcon_utils.egg-info/SOURCES.txt
 falcon_utils.egg-info/dependency_links.txt

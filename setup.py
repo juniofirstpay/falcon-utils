@@ -13,7 +13,7 @@ setup(
         'falcon_utils.hooks',
         'falcon_utils.response'
     ],
-    version='0.0.12',
+    version='0.0.13',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
