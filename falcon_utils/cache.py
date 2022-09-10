@@ -15,7 +15,7 @@ def get_default_redis_cache(
             "CACHE_EVICTION_STRATEGY": "time-based",
             "CACHE_REDIS_HOST": host,
             "CACHE_REDIS_PORT": port,
-            "CACHE_DB_PASSWORD": password,
+            "CACHE_REDIS_PASSWORD": password,
             "CACHE_REDIS_DB": db,
             "CACHE_KEY_PREFIX": key_prefix,
         }
