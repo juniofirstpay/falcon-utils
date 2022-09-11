@@ -1,6 +1,28 @@
 from typing import Optional
-from falcon_caching import Cache
+from falcon_caching import Cache, middleware
 
+@staticmethod
+def generate_cache_key(req, method: str = None) -> str:
+    """ Generate the cache key from the request using the path and the method """
+    path = req.path
+    if path.endswith('/'):
+        path = path[:-1]
+
+    if not method:
+        method = req.method
+
+    param_keys = list(req.params.keys())
+    param_keys.sort()
+    query_keys = []
+
+    for key in param_keys:
+        value = ",".join(req.get_param_as_list(key))
+        query_keys.append(f"{key}:{value}")
+    query_keys = ":".join(query_keys)
+
+    return f'{path}:{method.upper()}:{query_keys}'
+
+middleware.Middleware.generate_cache_key = generate_cache_key
 
 def get_default_redis_cache(
     host: "str" = "localhost",
