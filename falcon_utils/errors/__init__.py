@@ -135,3 +135,8 @@ class DataSerializationError(falcon.HTTPError):
         result = super().to_dict(obj_type)
         result['fields'] = self.fields
         return result
+    
+class RateLimitError(ApplicationError):
+    status = falcon.HTTP_429
+    name = "RateLimitError"
+    descriptuon="Request has been blocked due to violation of resource rate limits"
