@@ -139,4 +139,4 @@ class DataSerializationError(falcon.HTTPError):
 class RateLimitError(ApplicationError):
     status = falcon.HTTP_429
     name = "RateLimitError"
-    descriptuon="Request has been blocked due to violation of resource rate limits"
+    description="Request has been blocked due to violation of resource rate limits"
