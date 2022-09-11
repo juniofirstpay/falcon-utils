@@ -17,3 +17,4 @@ def setup_new_relic(
         return newrelic.agent.WSGIApplicationWrapper(app)
     except Exception as e:
         traceback.print_exc()
+    return app
