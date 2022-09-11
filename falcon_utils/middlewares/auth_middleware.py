@@ -1,5 +1,5 @@
 from datetime import datetime
-from errors import UnAuthorizedSession
+from falcon_utils.errors import UnAuthorizedSession
 
 
 class SimpleAuthMiddleware(object):
