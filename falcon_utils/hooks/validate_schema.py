@@ -1,7 +1,7 @@
 from typing import Type
 from marshmallow import ValidationError
 from marshmallow_objects import Model
-from errors import SchemaValidationError
+from falcon_utils.errors import SchemaValidationError
 
 
 class ValidateSchema(object):
