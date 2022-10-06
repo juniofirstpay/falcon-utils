@@ -35,10 +35,10 @@ class SimpleAuthMiddleware(object):
         
         auth = req.headers.get("Authorization", None)
         if auth and len(auth) > 0:
-            error, token = self.OAuth_client.introspection(
+            error, token = self.oauth_client.introspection(
                 None, None, auth_token_string, 'access_token')
             if not error:
-                error, oauth_user = self.OAuth_client.get_user(auth_token=auth_token_string)
+                error, oauth_user = self.oauth_client.get_user(auth_token=auth_token_string)
                 if not error:
                     return
                 
