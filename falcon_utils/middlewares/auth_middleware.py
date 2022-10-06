@@ -5,7 +5,7 @@ from oauth_micro_client import OAuthClient
 
 
 class SimpleAuthMiddleware(object):
-    def __init__(self, config: dict, oath_client=None):
+    def __init__(self, config: dict, OAuth_client=None):
         self.__config = config
         if self.__config.get("exempted_paths") is None:
             self.__config["exempted_paths"] = []
@@ -37,10 +37,10 @@ class SimpleAuthMiddleware(object):
         
         auth = req.headers.get("Authorization", None)
         if auth and len(auth) > 0:
-            error, token = oath_client.introspection(
+            error, token = OAuth_client.introspection(
                 None, None, auth_token_string, 'access_token')
             if not error:
-                error, oauth_user = oath_client.get_user(auth_token=auth_token_string)
+                error, oauth_user = OAuth_client.get_user(auth_token=auth_token_string)
                 if not error:
                     return
                 
