@@ -1,11 +1,9 @@
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
-from oauth_micro_client import OAuthClient
-
 
 
 class SimpleAuthMiddleware(object):
-    def __init__(self, config: dict, OAuth_client=None):
+    def __init__(self, config: dict, oauth_client=None):
         self.__config = config
         if self.__config.get("exempted_paths") is None:
             self.__config["exempted_paths"] = []
