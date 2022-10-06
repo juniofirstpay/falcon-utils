@@ -1,5 +1,7 @@
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
+from oauth_micro_client import OAuthClient
+
 
 
 class SimpleAuthMiddleware(object):
@@ -16,6 +18,9 @@ class SimpleAuthMiddleware(object):
 
     def process_request(self, req: object, resp: object) -> object:
         self.request_initate_time = datetime.utcnow()
+        
+       
+        token = None
 
         if req.path in self.__config.get("exempted_paths"):
             return
@@ -29,7 +34,18 @@ class SimpleAuthMiddleware(object):
         )
         if (self.__config.get("clients") or {}).get(client_id) == client_secret and client_id is not None and client_secret is not None:
             return
-
+        
+        auth = req.headers.get("Authorization", None)
+        if auth and len(auth) > 0:
+            with OAuthClient().open() as client:
+                auth_token_string = auth[7:]
+                error, token = client.introspection(
+                    None, None, auth_token_string, 'access_token')
+                if not error:
+                    error, oauth_user = client.get_user(auth_token=auth_token_string)
+                    if not error:
+                        return
+                
         raise UnAuthorizedSession()
 
     def process_response(self, req, resp, resource, params):
