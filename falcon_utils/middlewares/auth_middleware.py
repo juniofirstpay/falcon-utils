@@ -5,6 +5,7 @@ from falcon_utils.errors import UnAuthorizedSession
 class SimpleAuthMiddleware(object):
     def __init__(self, config: dict, oauth_client=None):
         self.__config = config
+        self.__oauth_client = oauth_client
         if self.__config.get("exempted_paths") is None:
             self.__config["exempted_paths"] = []
 
@@ -33,13 +34,15 @@ class SimpleAuthMiddleware(object):
         if (self.__config.get("clients") or {}).get(client_id) == client_secret and client_id is not None and client_secret is not None:
             return
         
-        auth = req.headers.get("Authorization", None)
+        auth = req.headers.get("AUTHORIZATION", None)
         if auth and len(auth) > 0:
-            error, token = self.oauth_client.introspection(
+            auth_token_string = auth[7:]
+            error, token = self.__oauth_client.introspection(
                 None, None, auth_token_string, 'access_token')
             if not error:
-                error, oauth_user = self.oauth_client.get_user(auth_token=auth_token_string)
-                if not error:
+                error, oauth_user = self.__oauth_client.get_user(auth_token=auth_token_string)
+                if not error and oauth_user.get("username"):
+                    setattr(req, 'user', oauth_user)
                     return
                 
         raise UnAuthorizedSession()
