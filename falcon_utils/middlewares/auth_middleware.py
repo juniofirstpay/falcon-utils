@@ -34,6 +34,7 @@ class SimpleAuthMiddleware(object):
         if (self.__config.get("clients") or {}).get(client_id) == client_secret and client_id is not None and client_secret is not None:
             return
         
+        
         auth = req.headers.get("AUTHORIZATION", None)
         if auth and len(auth) > 0:
             auth_token_string = auth[7:]
