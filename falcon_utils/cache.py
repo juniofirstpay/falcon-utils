@@ -29,8 +29,8 @@ def get_default_redis_cache(
     port: "int" = 6379,
     db: "int" = 0,
     password: "Optional[str]" = None,
-    redis_url: "Optional[str]" = None,
     key_prefix: "Optional[str]" = None,
+    redis_url: "Optional[str]" = None,
 ):
     config={
         "CACHE_TYPE": "redis",
