@@ -11,7 +11,7 @@ class inject_model(object):
         self.alias = None
         
     def __call__(self, req, resp, resource, params):
-        value = self.callable.__call__(req, resp, resource, params)
+        value = self.callable.__call__([req, resp, resource, params])
         if value is not None:
             obj = self.model.objects.filter({self.key: value}).first()
             setattr(req, self.alias or stringcase.snakecase(self.model.__name__), obj)
