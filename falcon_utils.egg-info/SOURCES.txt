@@ -14,6 +14,8 @@ falcon_utils/hooks/__init__.py
 falcon_utils/hooks/map_query.py
 falcon_utils/hooks/serialize_schema.py
 falcon_utils/hooks/validate_schema.py
+falcon_utils/hooks/mongo/__init__.py
+falcon_utils/hooks/mongo/inject_model.py
 falcon_utils/middlewares/__init__.py
 falcon_utils/middlewares/auth_middleware.py
 falcon_utils/middlewares/elastic_search_logging_middleware.py
