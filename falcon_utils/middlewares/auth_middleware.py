@@ -15,16 +15,21 @@ class SimpleAuthMiddleware(object):
 
         if self.__config.get("api_keys") is None:
             self.__config["api_keys"] = []
+        
+        if self.__config.get("ip_whitelist") is None:
+            self.__config["ip_whitelist"] = []
 
     def process_request(self, req: object, resp: object) -> object:
         self.request_initate_time = datetime.utcnow()
-        
        
         token = None
 
         if req.path in self.__config.get("exempted_paths"):
             return
 
+        if req.access_route[0] in self.__config.get("ip_whitelist"):
+            return
+        
         if req.headers.get("X-API-KEY") in self.__config.get("api_keys"):
             return
 
