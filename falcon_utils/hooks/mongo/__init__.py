@@ -1,5 +1,6 @@
 from typing import Union, Type, List, Optional, Dict
 from mongoengine import DynamicDocument, Document
+from .inject_model import inject_model
 
 class InjectModels(object):
 
