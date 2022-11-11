@@ -1,5 +1,43 @@
+import inspect
+import functools
 from typing import Optional
+from falcon_caching.middleware import _DECORABLE_METHOD_NAME
 from falcon_caching import Cache, middleware
+
+
+@staticmethod
+def cached(timeout: int):
+    """ This is the decorator used to decorate a resource class or the requested
+    method of the resource class
+    """
+    def wrap1(class_or_method, *args):
+        # is this about decorating a class or a given method?
+        if inspect.isclass(class_or_method):
+            # get all methods of the class that needs to be decorated (eg start with "on_"):
+            for attr in dir(class_or_method):
+                if callable(getattr(class_or_method, attr)) and _DECORABLE_METHOD_NAME.match(attr):
+                    setattr(class_or_method, attr, wrap1(getattr(class_or_method, attr)))
+
+            return class_or_method
+        else:  # this is to decorate the individual method
+            class_or_method.to_be_cached = True
+
+            @functools.wraps(class_or_method)
+            def cache_wrap(cls, req, resp, *args, **kwargs):
+                class_or_method(cls, req, resp, *args, **kwargs)
+                req.context.cache = True
+                req.context.cache_timeout = timeout
+
+            return cache_wrap
+
+    # this is the name which will check for if the decorator was registered with the register()
+    # function, as this decorator is not the topmost one
+    wrap1._decorator_name = 'cache'  # type: ignore
+
+    return wrap1
+
+
+Cache.cached = cached
 
 @staticmethod
 def generate_cache_key(req, method: str = None) -> str:

@@ -11,9 +11,10 @@ setup(
         'falcon_utils.csv', 
         'falcon_utils.routes',
         'falcon_utils.hooks',
+        'falcon_utils.hooks.mongo',
         'falcon_utils.response'
     ],
-    version='0.0.24',
+    version='0.0.27',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
