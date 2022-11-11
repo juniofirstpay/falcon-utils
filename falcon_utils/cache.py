@@ -24,6 +24,7 @@ def cached(timeout: int):
 
             @functools.wraps(class_or_method)
             def cache_wrap(cls, req, resp, *args, **kwargs):
+                print("WRAPPED_CACHE_FUNCTION_CALLED")
                 class_or_method(cls, req, resp, *args, **kwargs)
                 req.context.cache = True
                 req.context.cache_timeout = timeout
