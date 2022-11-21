@@ -14,7 +14,10 @@ class RateLimitingMiddleware:
     def __init__(self, config: "Dict"):
         self.__limiters = {}
         self.__config = config
-        self.__storage = storage.RedisStorage(f"redis://{self.__config['username']}:{self.__config['password']}@{self.__config['host']}:{self.__config['port']}")
+        if self.__config['password']:
+            self.__storage = storage.RedisStorage(f"redis://{self.__config['username']}:{self.__config['password']}@{self.__config['host']}:{self.__config['port']}")
+        else:
+            self.__storage = storage.RedisStorage(f"redis://{self.__config['host']}:{self.__config['port']}")
         if self.__config["type"] == self.Type.FIXED_WINDOW:
             self.__strategy = strategies.FixedWindowRateLimiter(self.__storage)
         elif self.__config["type"] == self.Type.ELASTIC_WINDOW:

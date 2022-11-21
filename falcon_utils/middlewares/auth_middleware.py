@@ -1,3 +1,4 @@
+import falcon
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
 
@@ -19,11 +20,15 @@ class SimpleAuthMiddleware(object):
         if self.__config.get("ip_whitelist") is None:
             self.__config["ip_whitelist"] = []
 
-    def process_request(self, req: object, resp: object) -> object:
+    def process_request(self, req: "falcon.Request", resp: "falcon.Response") -> object:
         self.request_initate_time = datetime.utcnow()
        
+        if req.method == 'OPTIONS':
+            resp.status = falcon.HTTP_200
+            return
+       
+       
         token = None
-
         if req.path in self.__config.get("exempted_paths"):
             return
 
