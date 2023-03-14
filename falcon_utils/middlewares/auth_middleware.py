@@ -2,7 +2,7 @@ import falcon
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
 
-from falcon_utils.jwt_auth import verify_token
+from falcon_utils.jwt_auth import JWTVerifyService
 
 
 class SimpleAuthMiddleware(object):
@@ -14,6 +14,9 @@ class SimpleAuthMiddleware(object):
         self.__config["clients"] = self.__config.get("clients", {})
         self.__config["api_keys"] = self.__config.get("api_keys", [])
         self.__config["ip_whitelist"] = self.__config.get("ip_whitelist", [])
+        self.__config["jwk_service_url"] = self.__config.get(
+            "jwk_service_url", "http://localhost:9000/api/jwt/jwk"
+        )
 
     def process_request(self, req: "falcon.Request", resp: "falcon.Response") -> object:
         self.request_initate_time = datetime.utcnow()
@@ -44,13 +47,14 @@ class SimpleAuthMiddleware(object):
             return
 
         jwt_auth = req.headers.get("JWT", None)
-        if jwt_auth: 
-            verified, token = verify_token(jwt_auth)
+        if jwt_auth:
+            service_url = self.__config["jwk_service_url"]
+            verified, token = JWTVerifyService(service_url).verify(jwt_auth)
             if not verified:
                 raise UnAuthorizedSession()
 
-            setattr(req, "auth_payload", token)    
-            return       
+            setattr(req, "authorisation", token)
+            return
 
         auth = req.headers.get("AUTHORIZATION", None)
         if auth and len(auth) > 0:
