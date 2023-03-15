@@ -55,9 +55,6 @@ class SimpleAuthMiddleware(object):
             
             req.context["authorization_scheme"] = AuthorizationScheme.JWT
             req.context["authorization_payload"] = token
-            
-            # TODO - Remove log
-            print("Authorization Scheme in `process_request`", req.context["authorization_scheme"], req.context.get("authorization_scheme"))
             return
 
         auth = req.headers.get("AUTHORIZATION", None)
@@ -84,14 +81,10 @@ class SimpleAuthMiddleware(object):
         publicly available.
         """
         authorization_schemes = getattr(resource, "authorization_schemes", [])
-        print("Authorization Schemes", authorization_schemes) # TODO - remove logs
-
         if len(authorization_schemes) == 0:
             return
 
         request_authorization_scheme = req.context.get("authorization_scheme", None)
-
-        print("Authorization Scheme", request_authorization_scheme) # TODO - remove logs
         if (
             request_authorization_scheme is None
             or request_authorization_scheme not in authorization_schemes
