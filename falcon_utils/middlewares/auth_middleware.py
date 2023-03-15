@@ -2,7 +2,7 @@ import falcon
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
 
-from falcon_utils.jwt_auth import JWTVerifyService
+from falcon_utils.jwt_auth import AuthorizationScheme, JWTVerifyService
 
 
 class SimpleAuthMiddleware(object):
@@ -46,14 +46,15 @@ class SimpleAuthMiddleware(object):
         ):
             return
 
-        jwt_auth = req.headers.get("JWT", None)
+        jwt_auth = req.headers.get("X-JWT", None)
         if jwt_auth:
             service_url = self.__config["jwk_service_url"]
             verified, token = JWTVerifyService(service_url).verify(jwt_auth)
             if not verified:
                 raise UnAuthorizedSession()
-
-            setattr(req, "authorisation", token)
+            
+            req.context["authorization_scheme"] = AuthorizationScheme.JWT
+            req.context["authorization_payload"] = token
             return
 
         auth = req.headers.get("AUTHORIZATION", None)
@@ -71,6 +72,25 @@ class SimpleAuthMiddleware(object):
                     return
 
         raise UnAuthorizedSession()
+
+    def process_resource(self, req, resp, resource, params):
+        """
+        Validate whethter the resource has specified any authorization schemes
+        to be validated against and was that authorization scheme added by `process_request`. 
+        In case no authorization scheme is specified, endpoint is assumed to be 
+        publicly available.
+        """
+        authorization_schemes = getattr(resource, "authorization_schemes", [])
+
+        if len(authorization_schemes) == 0:
+            return
+
+        request_authorization_scheme = req.context.get("authorization_scheme", None)
+        if (
+            request_authorization_scheme is None
+            or request_authorization_scheme not in authorization_schemes
+        ):
+            raise UnAuthorizedSession()
 
     def process_response(self, req, resp, resource, params):
         pass

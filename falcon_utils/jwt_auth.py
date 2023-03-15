@@ -1,4 +1,4 @@
-import os
+from enum import Enum
 import requests
 import datetime
 from authlib.jose import jwt, JoseError
@@ -31,17 +31,12 @@ class JWTVerifyService:
     def fetch_jwk(self):
         headers = {"X-Api-Version": "v1"}
         response = requests.get(self.service_url, headers=headers)
-
         if response.status_code != 200:
             return None
 
         return response.json()
 
     def verify(self, token: str):
-        jwk = self.fetch_jwk()
-        if not jwk:
-            return False, None
-
         try:
             jwk = self.fetch_jwk()
             if not jwk:
@@ -57,3 +52,7 @@ class JWTVerifyService:
             return True, decoded_token
         except JoseError as err:
             return False, None
+
+
+class AuthorizationScheme(Enum):
+    JWT = 'jwt'
