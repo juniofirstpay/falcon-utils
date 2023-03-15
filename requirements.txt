@@ -11,3 +11,4 @@ falcon-caching==1.1.0
 redis==4.3.4
 limits==2.7.0
 stringcase==1.2.0
+Authlib==1.2.0
