@@ -57,7 +57,7 @@ class SimpleAuthMiddleware(object):
             req.context["authorization_payload"] = token
             
             # TODO - Remove log
-            print("Authorization Scheme in `process_request`", req.context["authorization_scheme"], req.context.get("authorization_scheme", None))
+            print("Authorization Scheme in `process_request`", req.context["authorization_scheme"], req.context.get("authorization_scheme"))
             return
 
         auth = req.headers.get("AUTHORIZATION", None)
