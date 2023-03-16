@@ -27,12 +27,15 @@ class SimpleAuthMiddleware(object):
 
         token = None
         if req.path in self.__config.get("exempted_paths"):
+            req.context["authorization_scheme"] = AuthorizationScheme.EXEMPTED_PATH
             return
 
         if req.access_route[0] in self.__config.get("ip_whitelist"):
+            req.context["authorization_scheme"] = AuthorizationScheme.IP_WHITELIST
             return
 
         if req.headers.get("X-API-KEY") in self.__config.get("api_keys"):
+            req.context["authorization_scheme"] = AuthorizationScheme.API_KEY
             return
 
         client_id, client_secret = (
@@ -44,6 +47,7 @@ class SimpleAuthMiddleware(object):
             and client_id is not None
             and client_secret is not None
         ):
+            req.context["authorization_scheme"] = AuthorizationScheme.CLIENT_SECRET
             return
 
         jwt_auth = req.headers.get("X-JWT", None)
@@ -69,6 +73,7 @@ class SimpleAuthMiddleware(object):
                 )
                 if not error and oauth_user.get("username"):
                     setattr(req, "user", oauth_user)
+                    req.context["authorization_scheme"] = AuthorizationScheme.ACCESS_TOKEN
                     return
 
         raise UnAuthorizedSession()
