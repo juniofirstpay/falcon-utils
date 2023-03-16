@@ -2,7 +2,7 @@ import falcon
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
 
-from falcon_utils.jwt_auth import AuthorizationScheme, JWTVerifyService
+from falcon_utils.auth import AuthorizationScheme, JWTVerifyService
 
 
 class SimpleAuthMiddleware(object):
