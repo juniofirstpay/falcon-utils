@@ -8,7 +8,7 @@ class inject_model(object):
         self.model = model
         self.key = key
         self.callable = callable
-        self.alias = None
+        self.alias = alias
         
     def __call__(self, req, resp, resource, params):
         value = self.callable.__call__([req, resp, resource, params])
