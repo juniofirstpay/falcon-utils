@@ -1,11 +1,14 @@
 from enum import Enum
+import json
 import requests
 import datetime
-from authlib.jose import jwt, JoseError
+from jwcrypto.jwt import JWT
+from jwcrypto.common import JWException
+from jwcrypto.jwk import JWK
 from functools import lru_cache, wraps
 
 
-def timed_lru_cache(seconds: int, maxsize: int = None):
+def timed_lru_cache(seconds: int, maxsize: int = 128):
     def wrapper_cache(func):
         func = lru_cache(maxsize=maxsize)(func)
         func.lifetime = datetime.timedelta(seconds=seconds)
@@ -16,10 +19,10 @@ def timed_lru_cache(seconds: int, maxsize: int = None):
             if datetime.datetime.utcnow() >= func.expiration:
                 func.cache_clear()
                 func.expiration = datetime.datetime.utcnow() + func.lifetime
-            return func(*args, **kwargs)
 
+            result = func(*args, **kwargs)
+            return result
         return wrapped_func
-
     return wrapper_cache
 
 
@@ -38,19 +41,22 @@ class JWTVerifyService:
 
     def verify(self, token: str):
         try:
-            jwk = self.fetch_jwk()
-            if not jwk:
+            jwk_dict = self.fetch_jwk()
+            if not jwk_dict:
                 return False, None
 
-            decoded_token = jwt.decode(token, jwk)
-            expires_at = decoded_token.get("exp")
+            jwk = JWK(**jwk_dict)
+            decoded_token = JWT(key=jwk, jwt=token)
+            
+            claims = json.loads(decoded_token.claims)
+            expires_at = claims.get("exp")
             if not expires_at or expires_at < int(
                 datetime.datetime.utcnow().timestamp()
             ):
                 return False, None
 
-            return True, decoded_token
-        except JoseError as err:
+            return True, claims
+        except JWException as err:
             return False, None
 
 
@@ -61,3 +67,9 @@ class AuthorizationScheme(Enum):
     API_KEY = "api_key"
     CLIENT_SECRET = "client_secret"
     ACCESS_TOKEN = "access_token"
+
+
+class AccessLevel(Enum):
+    SELF = 'self'
+    DEPENDANT = 'dependant'
+    SELF_AND_DEPENDANT = 'self_and_dependant'
