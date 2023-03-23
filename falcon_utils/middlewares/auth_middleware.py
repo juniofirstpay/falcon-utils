@@ -2,21 +2,19 @@ import falcon
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
 
-from falcon_utils.auth import AuthorizationScheme, JWTVerifyService
+from falcon_utils.auth import AuthorizationScheme
 
 
 class SimpleAuthMiddleware(object):
-    def __init__(self, config: dict, oauth_client=None):
+    def __init__(self, config: dict, oauth_client=None, jwt_auth_service=None):
         self.__config = config
         self.__oauth_client = oauth_client
+        self.__jwt_auth_service = jwt_auth_service
 
         self.__config["exempted_paths"] = self.__config.get("exempted_paths", [])
         self.__config["clients"] = self.__config.get("clients", {})
         self.__config["api_keys"] = self.__config.get("api_keys", [])
         self.__config["ip_whitelist"] = self.__config.get("ip_whitelist", [])
-        self.__config["jwk_service_url"] = self.__config.get(
-            "jwk_service_url", "http://localhost:9000/api/jwt/jwk"
-        )
 
     def process_request(self, req: "falcon.Request", resp: "falcon.Response") -> object:
         self.request_initate_time = datetime.utcnow()
@@ -52,11 +50,10 @@ class SimpleAuthMiddleware(object):
 
         jwt_auth = req.headers.get("X-JWT", None)
         if jwt_auth:
-            service_url = self.__config["jwk_service_url"]
-            verified, token = JWTVerifyService(service_url).verify(jwt_auth)
+            verified, token = self.__jwt_auth_service.verify(jwt_auth)
             if not verified:
                 raise UnAuthorizedSession()
-            
+
             req.context["authorization_scheme"] = AuthorizationScheme.JWT
             req.context["authorization_payload"] = token
             return
@@ -73,7 +70,9 @@ class SimpleAuthMiddleware(object):
                 )
                 if not error and oauth_user.get("username"):
                     setattr(req, "user", oauth_user)
-                    req.context["authorization_scheme"] = AuthorizationScheme.ACCESS_TOKEN
+                    req.context[
+                        "authorization_scheme"
+                    ] = AuthorizationScheme.ACCESS_TOKEN
                     return
 
         raise UnAuthorizedSession()
@@ -81,8 +80,8 @@ class SimpleAuthMiddleware(object):
     def process_resource(self, req, resp, resource, params):
         """
         Validate whethter the resource has specified any authorization schemes
-        to be validated against and was that authorization scheme added by `process_request`. 
-        In case no authorization scheme is specified, endpoint is assumed to be 
+        to be validated against and was that authorization scheme added by `process_request`.
+        In case no authorization scheme is specified, endpoint is assumed to be
         publicly available.
         """
         authorization_schemes = getattr(resource, "authorization_schemes", [])
