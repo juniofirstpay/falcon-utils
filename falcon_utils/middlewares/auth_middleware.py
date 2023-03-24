@@ -1,3 +1,4 @@
+from typing import List, Optional
 import falcon
 from datetime import datetime
 from falcon_utils.errors import UnAuthorizedSession
@@ -84,11 +85,15 @@ class SimpleAuthMiddleware(object):
         In case no authorization scheme is specified, endpoint is assumed to be
         publicly available.
         """
-        authorization_schemes = getattr(resource, "authorization_schemes", [])
+        authorization_schemes: "List[AuthorizationScheme]" = getattr(
+            resource, "authorization_schemes", []
+        )
         if len(authorization_schemes) == 0:
             return
 
-        request_authorization_scheme = req.context.get("authorization_scheme", None)
+        request_authorization_scheme: "Optional[AuthorizationScheme]" = req.context.get(
+            "authorization_scheme", None
+        )
         if (
             request_authorization_scheme is None
             or request_authorization_scheme not in authorization_schemes

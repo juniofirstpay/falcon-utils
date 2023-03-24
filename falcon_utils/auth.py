@@ -22,7 +22,9 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
 
             result = func(*args, **kwargs)
             return result
+
         return wrapped_func
+
     return wrapper_cache
 
 
@@ -41,13 +43,13 @@ class JWTVerifyService:
 
     def verify(self, token: str):
         try:
-            jwk_dict = self.fetch_jwk()
-            if not jwk_dict:
+            jwk_api_response = self.fetch_jwk()
+            if not jwk_api_response:
                 return False, None
 
-            jwk_set = JWKSet.from_json(json.dumps(jwk_dict))
+            jwk_set = JWKSet.from_json(json.dumps(jwk_api_response))
             decoded_token = JWT(key=jwk_set, jwt=token)
-            
+
             claims = json.loads(decoded_token.claims)
             expires_at = claims.get("exp")
             if not expires_at or expires_at < int(
@@ -70,6 +72,6 @@ class AuthorizationScheme(Enum):
 
 
 class AccessLevel(Enum):
-    SELF = 'self'
-    DEPENDANT = 'dependant'
-    SELF_AND_DEPENDANT = 'self_and_dependant'
+    SELF = "self"
+    DEPENDANT = "dependant"
+    SELF_AND_DEPENDANT = "self_and_dependant"
