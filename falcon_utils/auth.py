@@ -4,7 +4,7 @@ import requests
 import datetime
 from jwcrypto.jwt import JWT
 from jwcrypto.common import JWException
-from jwcrypto.jwk import JWK
+from jwcrypto.jwk import JWKSet
 from functools import lru_cache, wraps
 
 
@@ -45,8 +45,8 @@ class JWTVerifyService:
             if not jwk_dict:
                 return False, None
 
-            jwk = JWK(**jwk_dict)
-            decoded_token = JWT(key=jwk, jwt=token)
+            jwk_set = JWKSet.from_json(json.dumps(jwk_dict))
+            decoded_token = JWT(key=jwk_set, jwt=token)
             
             claims = json.loads(decoded_token.claims)
             expires_at = claims.get("exp")
