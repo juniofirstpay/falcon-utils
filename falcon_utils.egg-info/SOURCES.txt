@@ -1,5 +1,6 @@
 setup.py
 falcon_utils/__init__.py
+falcon_utils/auth.py
 falcon_utils/cache.py
 falcon_utils/new_relic.py
 falcon_utils.egg-info/PKG-INFO
@@ -11,6 +12,7 @@ falcon_utils.egg-info/top_level.txt
 falcon_utils/csv/__init__.py
 falcon_utils/errors/__init__.py
 falcon_utils/hooks/__init__.py
+falcon_utils/hooks/authorize_payload.py
 falcon_utils/hooks/map_query.py
 falcon_utils/hooks/serialize_schema.py
 falcon_utils/hooks/validate_schema.py
