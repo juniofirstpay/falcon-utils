@@ -10,7 +10,7 @@ class AuthorizePayload:
         self.callable = callable
         self.level = level
 
-    def __call__(self, req: falcon.Request, resp: falcon.Response, resource, params: Dict) -> Any:
+    def __call__(self, req: falcon.Request, resp: falcon.Response, resource, params: Dict) -> None:
         authorization_payload = req.context.get("authorization_payload")
         if authorization_payload == None:
             return
