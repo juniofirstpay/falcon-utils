@@ -14,7 +14,7 @@ setup(
         'falcon_utils.hooks.mongo',
         'falcon_utils.response'
     ],
-    version='0.1.0',
+    version='0.1.1',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
