@@ -1,23 +1,23 @@
 import falcon
-from typing import Callable, Dict
+from typing import Any, Callable, Dict, Tuple
 
 from falcon_utils.auth import AccessLevel
 from falcon_utils.errors import UnAuthorizedSession
 
 
 class AuthorizePayload:
-    def __init__(self, callable: Callable[[falcon.Request], str], level: AccessLevel) -> None:
+    def __init__(self, callable: Callable[[Tuple[falcon.Request, falcon.Response, Any, Dict]], str], level: AccessLevel) -> None:
         self.callable = callable
         self.level = level
 
     def __call__(self, req: falcon.Request, resp: falcon.Response, resource, params: Dict) -> None:
         authorization_payload = req.context.get("authorization_payload")
         if authorization_payload == None:
-            return
+            raise UnAuthorizedSession()
         
-        value = self.callable(req)
+        value = self.callable((req, resp, resource, params))
         if value == None:
-            return
+            raise UnAuthorizedSession()
         
         profiles = authorization_payload.get("profiles")
         person_ids = {
