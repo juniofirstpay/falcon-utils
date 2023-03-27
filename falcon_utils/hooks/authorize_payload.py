@@ -1,5 +1,5 @@
 import falcon
-from typing import Any, Callable, Dict, Tuple, TypeVar, Type
+from typing import Any, Callable, Dict, Tuple
 
 from falcon_utils.auth import AccessLevel
 from falcon_utils.errors import UnAuthorizedSession
