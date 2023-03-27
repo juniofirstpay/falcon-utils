@@ -83,18 +83,27 @@ class SimpleAuthMiddleware(object):
         this is because `process_request` does not provide with `uri_template` which is
         being used to match the route in `self.__config.get('exempted_paths')` list.
         """
-        if req.context.get("authorization_scheme") is None:
+        request_authorization_scheme: "Optional[AuthorizationScheme]" = req.context.get(
+            "authorization_scheme", None
+        )
+        authorization_schemes: "List[AuthorizationScheme]" = getattr(
+            resource, "authorization_schemes", []
+        )
+
+        if len(authorization_schemes) == 0:
+            return
+
+        if request_authorization_scheme is None:
             if req.uri_template not in self.__config.get("exempted_paths"):
                 raise UnAuthorizedSession()
                 
             req.context["authorization_scheme"] = AuthorizationScheme.EXEMPTED_PATH
-
-        authorization_schemes: "List[AuthorizationScheme]" = getattr(
-            resource, "authorization_schemes", []
-        )
-        request_authorization_scheme: "Optional[AuthorizationScheme]" = req.context.get(
-            "authorization_scheme", None
-        )
+            
+        
+        if request_authorization_scheme == AuthorizationScheme.EXEMPTED_PATH:
+            # Adding a shortcut for anonymous authorization
+            return 
+        
         if (
             request_authorization_scheme is None
             or request_authorization_scheme not in authorization_schemes
