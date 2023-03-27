@@ -24,11 +24,6 @@ class SimpleAuthMiddleware(object):
             resp.status = falcon.HTTP_200
             return
 
-        token = None
-        if req.path in self.__config.get("exempted_paths"):
-            req.context["authorization_scheme"] = AuthorizationScheme.EXEMPTED_PATH
-            return
-
         if req.access_route[0] in self.__config.get("ip_whitelist"):
             req.context["authorization_scheme"] = AuthorizationScheme.IP_WHITELIST
             return
@@ -65,32 +60,38 @@ class SimpleAuthMiddleware(object):
             error, token = self.__oauth_client.introspection(
                 None, None, auth_token_string, "access_token"
             )
-            if not error:
-                error, oauth_user = self.__oauth_client.get_user(
-                    auth_token=auth_token_string
-                )
-                if not error and oauth_user.get("username"):
-                    setattr(req, "user", oauth_user)
-                    req.context[
-                        "authorization_scheme"
-                    ] = AuthorizationScheme.ACCESS_TOKEN
-                    return
+            if error:
+                raise UnAuthorizedSession()
 
-        raise UnAuthorizedSession()
+            error, oauth_user = self.__oauth_client.get_user(
+                auth_token=auth_token_string
+            )
+            if error or not oauth_user.get("username"):
+                raise UnAuthorizedSession()
 
-    def process_resource(self, req, resp, resource, params):
+            setattr(req, "user", oauth_user)
+            req.context["authorization_scheme"] = AuthorizationScheme.ACCESS_TOKEN
+            return
+
+    def process_resource(
+        self, req: "falcon.Request", resp: "falcon.Response", resource, params
+    ):
         """
         Validate whethter the resource has specified any authorization schemes
         to be validated against and was that authorization scheme added by `process_request`.
-        In case no authorization scheme is specified, endpoint is assumed to be
-        publicly available.
+        `AuthorizationScheme.EXEMPTED_PATH is a special case and handled separately,
+        this is because `process_request` does not provide with `uri_template` which is
+        being used to match the route in `self.__config.get('exempted_paths')` list.
         """
+        if req.context.get("authorization_scheme") is None:
+            if req.uri_template not in self.__config.get("exempted_paths"):
+                raise UnAuthorizedSession()
+                
+            req.context["authorization_scheme"] = AuthorizationScheme.EXEMPTED_PATH
+
         authorization_schemes: "List[AuthorizationScheme]" = getattr(
             resource, "authorization_schemes", []
         )
-        if len(authorization_schemes) == 0:
-            return
-
         request_authorization_scheme: "Optional[AuthorizationScheme]" = req.context.get(
             "authorization_scheme", None
         )
