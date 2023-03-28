@@ -58,7 +58,7 @@ class JWTVerifyService:
                 return False, None
 
             return True, claims
-        except JWException as err:
+        except (JWException, ValueError) as err:
             return False, None
 
 
