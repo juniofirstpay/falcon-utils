@@ -11,9 +11,9 @@ class ApiVersioningScheme(object):
             self.get(req, resp, *args, **kwargs)
             return
 
-        route_handler: Callable[
-            [falcon.Request, falcon.Response, Tuple, Dict], None
-        ] = getattr(self, f"on_get_{api_version}", None)
+        route_handler: "Callable[[falcon.Request, falcon.Response, Tuple, Dict], None]" = getattr(
+            self, f"on_get_{api_version}", None
+        )
         if not route_handler:
             raise InvalidApiVersionScheme()
 
@@ -25,9 +25,9 @@ class ApiVersioningScheme(object):
             self.post(req, resp, *args, **kwargs)
             return
 
-        route_handler: Callable[
-            [falcon.Request, falcon.Response, Tuple, Dict], None
-        ] = getattr(self, f"on_post_{api_version}", None)
+        route_handler: "Callable[[falcon.Request, falcon.Response, Tuple, Dict], None]" = getattr(
+            self, f"on_post_{api_version}", None
+        )
         if not route_handler:
             raise InvalidApiVersionScheme()
 
