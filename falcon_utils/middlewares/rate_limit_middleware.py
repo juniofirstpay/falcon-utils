@@ -14,7 +14,9 @@ class RateLimitingMiddleware:
     def __init__(self, config: "Dict"):
         self.__limiters = {}
         self.__config = config
-        if self.__config['password']:
+        if self.__config.get('url'):
+            self.__storage = storage.RedisStorage(self.__config['url'])
+        elif self.__config.get('password'):
             self.__storage = storage.RedisStorage(f"redis://{self.__config['username']}:{self.__config['password']}@{self.__config['host']}:{self.__config['port']}")
         else:
             self.__storage = storage.RedisStorage(f"redis://{self.__config['host']}:{self.__config['port']}")
@@ -31,7 +33,6 @@ class RateLimitingMiddleware:
     
     def process_resource(self, req:"falcon.Request", resp: "falcon.Response", resource, params):
         namespace = f"{resource.__class__.__name__}.on_{req.method.lower()}"
-        print("NAMESPACE_ON_PROCESS_RESOURCE", namespace)
         limiters = self.__limiters.get(namespace)
         if limiters is not None and isinstance(limiters, list):
             blocking_limit_item = next(filter(lambda limit_item: self.__strategy.hit(limit_item, req.path, req.method) == False, limiters), None)

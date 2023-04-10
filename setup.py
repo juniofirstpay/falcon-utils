@@ -12,9 +12,10 @@ setup(
         'falcon_utils.routes',
         'falcon_utils.hooks',
         'falcon_utils.hooks.mongo',
-        'falcon_utils.response'
+        'falcon_utils.response',
+        'falcon_utils.mixins'
     ],
-    version='0.0.29',
+    version='0.1.1',
     author="Develper Junio",
     author_email='developer@junio.in',
     classifiers=[
