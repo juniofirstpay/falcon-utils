@@ -22,6 +22,7 @@ class SimpleAuthMiddleware(object):
 
         if req.method == "OPTIONS":
             resp.status = falcon.HTTP_200
+            resp.complete = True
             return
 
         if req.access_route[0] in self.__config.get("ip_whitelist"):
