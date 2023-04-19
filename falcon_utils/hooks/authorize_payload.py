@@ -1,7 +1,7 @@
 import falcon
 from typing import Any, Callable, Dict, Tuple
 
-from falcon_utils.auth import AccessLevel
+from falcon_utils.auth import AccessLevel, AuthorizationScheme
 from falcon_utils.errors import UnAuthorizedSession
 
 
@@ -19,6 +19,10 @@ class AuthorizePayload:
     def __call__(
         self, req: "falcon.Request", resp: "falcon.Response", resource, params: "Dict"
     ) -> None:
+        authorization_scheme = req.context.get("authorization_scheme")
+        if authorization_scheme != AuthorizationScheme.JWT:
+            return
+        
         authorization_payload = req.context.get("authorization_payload")
         if authorization_payload == None:
             raise UnAuthorizedSession()
