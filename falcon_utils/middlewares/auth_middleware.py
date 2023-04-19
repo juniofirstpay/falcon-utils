@@ -34,8 +34,8 @@ class SimpleAuthMiddleware(object):
             return
 
         client_id, client_secret = (
-            req.headers.get("CLIENT-ID"),
-            req.headers.get("CLIENT-SECRET"),
+            req.headers.get("CLIENT-ID") or req.headers.get("CLIENTID"),
+            req.headers.get("CLIENT-SECRET") or req.headers.get("CLIENTSECRET"),
         )
         if (
             (self.__config.get("clients") or {}).get(client_id) == client_secret
