@@ -7,7 +7,7 @@ from falcon_caching import Cache, middleware
 # from falcon import HTTP_200
 # import logging
 
-FALCONVERSION_MAIN = 3
+# FALCONVERSION_MAIN = 3
 
 
 @staticmethod
