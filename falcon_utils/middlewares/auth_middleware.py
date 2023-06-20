@@ -1,7 +1,7 @@
 from typing import List, Optional
 import falcon
 from datetime import datetime
-from falcon_utils.errors import ForbiddenError, InvalidJWTError, UnAuthorizedSession
+from falcon_utils.errors import ForbiddenError, InvalidJWTError, ServiceFailureError, UnAuthorizedSession
 
 from falcon_utils.auth import AuthorizationScheme, JWTVerificationError
 
@@ -52,7 +52,7 @@ class SimpleAuthMiddleware(object):
                 error_mapping = {
                     JWTVerificationError.EXPIRED: InvalidJWTError,
                     JWTVerificationError.INVALID: UnAuthorizedSession,
-                    JWTVerificationError.INTERNAL: UnAuthorizedSession,
+                    JWTVerificationError.INTERNAL: ServiceFailureError,
                 }
 
                 raise error_mapping.get(verification_error, UnAuthorizedSession)()
