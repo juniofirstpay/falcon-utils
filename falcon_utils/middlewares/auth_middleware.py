@@ -1,9 +1,9 @@
 from typing import List, Optional
 import falcon
 from datetime import datetime
-from falcon_utils.errors import UnAuthorizedSession
+from falcon_utils.errors import ForbiddenError, InvalidJWTError, ServiceFailureError, UnAuthorizedSession
 
-from falcon_utils.auth import AuthorizationScheme
+from falcon_utils.auth import AuthorizationScheme, JWTVerificationError
 
 
 class SimpleAuthMiddleware(object):
@@ -47,9 +47,15 @@ class SimpleAuthMiddleware(object):
 
         jwt_auth = req.headers.get("X-JWT", None)
         if jwt_auth:
-            verified, token = self.__jwt_auth_service.verify(jwt_auth)
-            if not verified:
-                raise UnAuthorizedSession()
+            verification_error, token = self.__jwt_auth_service.verify(jwt_auth)
+            if verification_error:
+                error_mapping = {
+                    JWTVerificationError.EXPIRED: InvalidJWTError,
+                    JWTVerificationError.INVALID: UnAuthorizedSession,
+                    JWTVerificationError.INTERNAL: ServiceFailureError,
+                }
+
+                raise error_mapping.get(verification_error, UnAuthorizedSession)()
 
             req.context["authorization_scheme"] = AuthorizationScheme.JWT
             req.context["authorization_payload"] = token
@@ -87,29 +93,28 @@ class SimpleAuthMiddleware(object):
         request_authorization_scheme: "Optional[AuthorizationScheme]" = req.context.get(
             "authorization_scheme", None
         )
-        authorization_schemes: "List[AuthorizationScheme]" = getattr(
+        resource_authorization_schemes: "List[AuthorizationScheme]" = getattr(
             resource, "authorization_schemes", []
         )
 
-        if len(authorization_schemes) == 0:
+        if len(resource_authorization_schemes) == 0:
             return
 
         if request_authorization_scheme is None:
             if req.uri_template not in self.__config.get("exempted_paths"):
                 raise UnAuthorizedSession()
-                
+
             req.context["authorization_scheme"] = AuthorizationScheme.EXEMPTED_PATH
-            
-        
+
         if request_authorization_scheme == AuthorizationScheme.EXEMPTED_PATH:
             # Adding a shortcut for anonymous authorization
-            return 
-        
-        if (
-            request_authorization_scheme is None
-            or request_authorization_scheme not in authorization_schemes
-        ):
+            return
+
+        if request_authorization_scheme is None:
             raise UnAuthorizedSession()
+
+        if request_authorization_scheme not in resource_authorization_schemes:
+            raise ForbiddenError()
 
     def process_response(self, req, resp, resource, params):
         pass

@@ -1,8 +1,9 @@
 from enum import Enum
 import json
+from typing import Union
 import requests
 import datetime
-from jwcrypto.jwt import JWT
+from jwcrypto.jwt import JWT, JWTExpired
 from jwcrypto.common import JWException
 from jwcrypto.jwk import JWKSet
 from functools import lru_cache, wraps
@@ -41,25 +42,22 @@ class JWTVerifyService:
 
         return response.json()
 
-    def verify(self, token: str):
+    def verify(self, token: str) -> "Union[tuple[JWTVerificationError, None], tuple[None, str]]":
         try:
             jwk_api_response = self.fetch_jwk()
             if not jwk_api_response:
-                return False, None
+                return JWTVerificationError.INTERNAL, None
 
             jwk_set = JWKSet.from_json(json.dumps(jwk_api_response))
             decoded_token = JWT(key=jwk_set, jwt=token)
-
             claims = json.loads(decoded_token.claims)
-            expires_at = claims.get("exp")
-            if not expires_at or expires_at < int(
-                datetime.datetime.utcnow().timestamp()
-            ):
-                return False, None
 
-            return True, claims
-        except (JWException, ValueError) as err:
-            return False, None
+            return None, claims
+        except (JWException, ValueError) as error:
+            if isinstance(error, JWTExpired):
+                return JWTVerificationError.EXPIRED, None
+            
+            return JWTVerificationError.INVALID, None
 
 
 class AuthorizationScheme(Enum):
@@ -75,3 +73,9 @@ class AccessLevel(Enum):
     SELF = "self"
     DEPENDANT = "dependant"
     SELF_AND_DEPENDANT = "self_and_dependant"
+
+
+class JWTVerificationError(Enum):
+    EXPIRED = "expired"
+    INVALID = "invalid"
+    INTERNAL = "internal"

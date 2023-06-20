@@ -111,6 +111,18 @@ class UnAuthorizedSession(ApplicationError):
     description = "Request is not authenticated"
 
 
+class InvalidJWTError(ApplicationError):
+    status = falcon.HTTP_403
+    name = "InvalidJWTError"
+    description = "Invalid token provided, please contact adminstrator."
+
+
+class ForbiddenError(ApplicationError):
+    status = falcon.HTTP_403
+    name = "ForbiddenError"
+    description = "Request is forbidden"
+
+
 class VoucherRedeemError(ApplicationError):
     name = "VoucherRedeemViolation"
     description = "{voucher_code} is not a applicable becuse {error}"
@@ -145,3 +157,5 @@ class RateLimitError(ApplicationError):
 class ServiceFailureError(ApplicationError):
     
     status = falcon.HTTP_500
+    name = "ServiceFailureError"
+    description = "Internal service failure"
