@@ -157,3 +157,5 @@ class RateLimitError(ApplicationError):
 class ServiceFailureError(ApplicationError):
     
     status = falcon.HTTP_500
+    name = "ServiceFailureError"
+    description = "Internal service failure"
