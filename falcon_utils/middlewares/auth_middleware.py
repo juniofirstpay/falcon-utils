@@ -24,6 +24,22 @@ class SimpleAuthMiddleware(object):
             resp.status = falcon.HTTP_200
             resp.complete = True
             return
+        
+        jwt_auth = req.headers.get("X-JWT", None)
+        if jwt_auth:
+            verification_error, token = self.__jwt_auth_service.verify(jwt_auth)
+            if verification_error:
+                error_mapping = {
+                    JWTVerificationError.EXPIRED: InvalidJWTError,
+                    JWTVerificationError.INVALID: UnAuthorizedSession,
+                    JWTVerificationError.INTERNAL: ServiceFailureError,
+                }
+
+                raise error_mapping.get(verification_error, UnAuthorizedSession)()
+
+            req.context["authorization_scheme"] = AuthorizationScheme.JWT
+            req.context["authorization_payload"] = token
+            return
 
         if req.access_route[0] in self.__config.get("ip_whitelist"):
             req.context["authorization_scheme"] = AuthorizationScheme.IP_WHITELIST
@@ -43,22 +59,6 @@ class SimpleAuthMiddleware(object):
             and client_secret is not None
         ):
             req.context["authorization_scheme"] = AuthorizationScheme.CLIENT_SECRET
-            return
-
-        jwt_auth = req.headers.get("X-JWT", None)
-        if jwt_auth:
-            verification_error, token = self.__jwt_auth_service.verify(jwt_auth)
-            if verification_error:
-                error_mapping = {
-                    JWTVerificationError.EXPIRED: InvalidJWTError,
-                    JWTVerificationError.INVALID: UnAuthorizedSession,
-                    JWTVerificationError.INTERNAL: ServiceFailureError,
-                }
-
-                raise error_mapping.get(verification_error, UnAuthorizedSession)()
-
-            req.context["authorization_scheme"] = AuthorizationScheme.JWT
-            req.context["authorization_payload"] = token
             return
 
         auth = req.headers.get("AUTHORIZATION", None)
