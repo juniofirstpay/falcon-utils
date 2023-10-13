@@ -63,7 +63,12 @@ def generate_cache_key(req, method: str = None) -> str:
         query_keys.append(f"{key}:{value}")
     query_keys = ":".join(query_keys)
 
-    return f'{path}:{method.upper()}:{query_keys}'
+    cache_key = f'{path}:{method.upper()}:{query_keys}'
+    jwt_exists = req.headers.get("X-JWT")
+    if jwt_exists:
+        cache_key = f'{cache_key}:{"jwt"}'
+
+    return cache_key
 
 
 # def process_resource(self, req, resp, resource, params):
