@@ -66,7 +66,7 @@ def generate_cache_key(req, method: str = None) -> str:
     cache_key = f'{path}:{method.upper()}:{query_keys}'
     jwt_exists = req.headers.get("X-JWT")
     if jwt_exists:
-        cache_key = f'{cache_key}:{"jwt"}'
+        cache_key = f'{cache_key}:jwt'
 
     return cache_key
 
