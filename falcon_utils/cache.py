@@ -110,7 +110,7 @@ def process_resource(self, req, resp, resource, params):
         # get the name of the responder wrapper, which for cached objects is 'cache_wrap'
         # see the "Cache.cache" decorator in cache.py
         responder_wrapper_name = getattr(getattr(resource, responder), '__name__')
-        responder_cache_wrapper_name = getattr(getattr(resource, responder), '__cache_name__')
+        responder_cache_wrapper_name = getattr(getattr(resource, responder), '__cache_name__', None)
 
 
         # is the given method (or its class) decorated by the cache_wrap being the topmost decorator?
