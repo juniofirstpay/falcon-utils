@@ -22,7 +22,6 @@ class SimpleAuthMiddleware(object):
 
         if req.method == "OPTIONS":
             resp.status = falcon.HTTP_200
-            resp.complete = True
             return
         
         jwt_auth = req.headers.get("X-JWT", None)
@@ -90,6 +89,9 @@ class SimpleAuthMiddleware(object):
         this is because `process_request` does not provide with `uri_template` which is
         being used to match the route in `self.__config.get('exempted_paths')` list.
         """
+        if req.method == "OPTIONS":
+            return
+
         request_authorization_scheme: "Optional[AuthorizationScheme]" = req.context.get(
             "authorization_scheme", None
         )
