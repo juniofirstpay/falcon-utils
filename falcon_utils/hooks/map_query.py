@@ -11,7 +11,11 @@ class MapQuery(object):
     def __call__(self, req, resp, resource, params):
         try:
             for field in self.list_fields:
-                req.params[field] = req.get_param_as_list(field)
+                value = req.get_param_as_list(field) or req.get_param_as_list(f"{field}[]")
+                if not value:
+                    continue
+
+                req.params[field] = value
             setattr(req.context, 'data', self.schema(**req.params))
         except ValidationError as err:
             raise SchemaValidationError(err.messages)
