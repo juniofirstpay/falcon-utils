@@ -42,11 +42,14 @@ class JWTVerifyService:
 
         return response.json()
 
-    def verify(self, token: str) -> "Union[tuple[JWTVerificationError, None], tuple[None, str]]":
+    def verify(self, token: str, jwkset=None) -> "Union[tuple[JWTVerificationError, None], tuple[None, str]]":
         try:
             jwk_api_response = self.fetch_jwk()
             if not jwk_api_response:
-                return JWTVerificationError.INTERNAL, None
+                if jwkset is not None:
+                    jwk_api_response = jwkset
+                else:
+                    return JWTVerificationError.INTERNAL, None
 
             jwk_set = JWKSet.from_json(json.dumps(jwk_api_response))
             decoded_token = JWT(key=jwk_set, jwt=token)
