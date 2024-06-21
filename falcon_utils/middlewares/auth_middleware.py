@@ -28,13 +28,16 @@ class SimpleAuthMiddleware(object):
         if jwt_auth:
             verification_error, token = self.__jwt_auth_service.verify(jwt_auth)
             if verification_error:
-                error_mapping = {
-                    JWTVerificationError.EXPIRED: InvalidJWTError,
-                    JWTVerificationError.INVALID: UnAuthorizedSession,
-                    JWTVerificationError.INTERNAL: ServiceFailureError,
-                }
+                if self.__config.get("jwks"):
+                    token = self.__config.get("jwks")
+                else:
+                    error_mapping = {
+                        JWTVerificationError.EXPIRED: InvalidJWTError,
+                        JWTVerificationError.INVALID: UnAuthorizedSession,
+                        JWTVerificationError.INTERNAL: ServiceFailureError,
+                    }
 
-                raise error_mapping.get(verification_error, UnAuthorizedSession)()
+                    raise error_mapping.get(verification_error, UnAuthorizedSession)()
 
             req.context["authorization_scheme"] = AuthorizationScheme.JWT
             req.context["authorization_payload"] = token
