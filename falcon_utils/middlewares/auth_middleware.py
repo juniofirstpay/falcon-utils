@@ -26,7 +26,7 @@ class SimpleAuthMiddleware(object):
         
         jwt_auth = req.headers.get("X-JWT", None)
         if jwt_auth:
-            verification_error, token = self.__jwt_auth_service.verify(jwt_auth)
+            verification_error, token = self.__jwt_auth_service.verify(jwt_auth, self.__config.get("jwks"))
             if verification_error:
                 error_mapping = {
                     JWTVerificationError.EXPIRED: InvalidJWTError,
